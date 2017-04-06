@@ -32,6 +32,8 @@ public class FileTableViewController implements Observer {
     private ObservableList<FileEntry> data =
             FXCollections.observableArrayList();
 
+    private File currentDirectory;
+
     @FXML
     private TableView<FileEntry> fileView;
 
@@ -46,6 +48,8 @@ public class FileTableViewController implements Observer {
 
     @FXML
     private void initialize() {
+        currentDirectory = new File(System.getProperty(USER_HOME));
+
         LanguageManager.getInstance().addObserver(this);
 
         fileView.getColumns().forEach((column) -> column.prefWidthProperty().bind(fileView.widthProperty().multiply(TABLE_WIDTH_PERCENT)));
@@ -54,8 +58,7 @@ public class FileTableViewController implements Observer {
         fileSizeColumn.setCellValueFactory(new PropertyValueFactory<>(FILE_SIZE));
         createdOnColumn.setCellValueFactory(new PropertyValueFactory<>(CREATED_ON));
 
-        //TODO prowizorka - uładnić
-        fillView(new File(System.getProperty(USER_HOME)));
+        fillView(currentDirectory);
 
         fileView.getSortOrder().setAll(Collections.singletonList(fileNameColumn));
     }
@@ -76,5 +79,6 @@ public class FileTableViewController implements Observer {
         fileNameColumn.setText(translate(FILE_NAME));
         fileSizeColumn.setText(translate(FILE_SIZE));
         createdOnColumn.setText(translate(CREATED_ON));
+        fillView(currentDirectory);
     }
 }

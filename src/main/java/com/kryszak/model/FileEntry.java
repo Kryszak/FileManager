@@ -45,28 +45,32 @@ public class FileEntry {
         this.fileSize.set(fileSize);
     }
     public String getCreatedOn() {
-        return DateFormat.getDateInstance(DateFormat.DEFAULT, LanguageManager.getInstance().getSelectedLocale()).format(new Date(createdOn.get()));
+        return DateFormat.getDateTimeInstance(
+                DateFormat.DEFAULT,
+                DateFormat.DEFAULT,
+                LanguageManager.getInstance().getSelectedLocale()
+        ).format(new Date(createdOn.get()));
     }
     public void setCreatedOn(long createdOn) {
         this.createdOn.set(createdOn);
     }
 
-    public FileEntry file(File file){
+    public FileEntry file(File file) {
         this.file = file;
         return this;
     }
 
-    public FileEntry fileName(String fileName){
+    public FileEntry fileName(String fileName) {
         this.fileName.set(fileName);
         return this;
     }
 
-    public FileEntry fileSize(long fileSize){
+    public FileEntry fileSize(long fileSize) {
         this.fileSize.set(fileSize);
         return this;
     }
 
-    public FileEntry createdOn(long createdOn){
+    public FileEntry createdOn(long createdOn) {
         this.createdOn.set(createdOn);
         return this;
     }
