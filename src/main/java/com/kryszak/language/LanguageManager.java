@@ -6,13 +6,15 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.ResourceBundle;
 
+import static com.kryszak.config.ApplicationConfiguration.getProperty;
+
 public class LanguageManager extends Observable {
 
     public static final String PL = "pl";
 
     public static final String EN = "en";
 
-    private static final String BUNDLE_NAME = "translation";
+    private static final String BUNDLE_NAME = getProperty("application.resource.bundle.name");
 
     private static LanguageManager instance;
 

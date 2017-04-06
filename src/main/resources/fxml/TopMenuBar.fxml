@@ -1,18 +1,21 @@
-<?import javafx.scene.control.MenuBar?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<MenuBar fx:controller="com.kryszak.controllers.TopMenuBarController" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1">
+<MenuBar fx:controller="com.kryszak.controllers.TopMenuBarController" xmlns="http://javafx.com/javafx/8.0.112"
+         xmlns:fx="http://javafx.com/fxml/1">
     <menus>
         <Menu fx:id="fileMenu" mnemonicParsing="false" text="%fileMenu">
             <items>
-                <MenuItem fx:id="closeMenuOption" mnemonicParsing="false" text="%closeOption" />
+                <MenuItem fx:id="closeMenuOption" mnemonicParsing="false" text="%closeOption"/>
             </items>
         </Menu>
         <Menu fx:id="optionMenu" mnemonicParsing="false" text="%optionsMenu">
             <Menu fx:id="selectLanguageSubMenu" mnemonicParsing="false" text="%selectLanguageOption">
                 <items>
-                    <MenuItem fx:id="englishOption" mnemonicParsing="false" text="%englishOption" />
-                    <MenuItem fx:id="polishOption" mnemonicParsing="false" text="%polishOption" />
+                    <MenuItem fx:id="englishOption" mnemonicParsing="false" text="%englishOption"/>
+                    <MenuItem fx:id="polishOption" mnemonicParsing="false" text="%polishOption"/>
                 </items>
             </Menu>
         </Menu>

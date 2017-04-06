@@ -9,14 +9,19 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+import static com.kryszak.config.ApplicationConfiguration.getProperty;
+
 public class Main extends Application {
 
-    private static final String APPLICATION_TITLE = "Conquer and Command";
+    private static final String APPLICATION_TITLE = getProperty("application.title");
+
+    private static final String MAIN_LAYOUT_FXML = "/fxml/MainLayout.fxml";
 
     private FXMLLoader loader;
 
     public void start(Stage primaryStage) throws IOException {
-        loader = new FXMLLoader(getClass().getResource("/fxml/MainLayout.fxml"));
+        setUserAgentStylesheet(STYLESHEET_MODENA);
+        loader = new FXMLLoader(getClass().getResource(MAIN_LAYOUT_FXML));
         loader.setResources(LanguageManager.getInstance().getResources());
 
         Parent root = loader.load();

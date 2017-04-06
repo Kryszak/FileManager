@@ -11,12 +11,23 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Observable;
 import java.util.Observer;
 
 import static com.kryszak.language.StringUtilities.translate;
 
 public class FileTableViewController implements Observer {
+
+    private static final double TABLE_WIDTH_PERCENT = 0.33;
+
+    private static final String FILE_NAME = "fileName";
+
+    private static final String CREATED_ON = "createdOn";
+
+    private static final String FILE_SIZE = "fileSize";
+
+    private static final String USER_HOME = "user.home";
 
     private final ObservableList<FileEntry> data =
             FXCollections.observableArrayList();
@@ -37,34 +48,33 @@ public class FileTableViewController implements Observer {
     private void initialize() {
         LanguageManager.getInstance().addObserver(this);
 
-        fileView.getColumns().forEach((column) -> column.prefWidthProperty().bind(fileView.widthProperty().multiply(0.33)));
+        fileView.getColumns().forEach((column) -> column.prefWidthProperty().bind(fileView.widthProperty().multiply(TABLE_WIDTH_PERCENT)));
 
-        fileNameColumn.setCellValueFactory(new PropertyValueFactory<>("fileName"));
-        fileSizeColumn.setCellValueFactory(new PropertyValueFactory<>("fileSize"));
-        createdOnColumn.setCellValueFactory(new PropertyValueFactory<>("createdOn"));
+        fileNameColumn.setCellValueFactory(new PropertyValueFactory<>(FILE_NAME));
+        fileSizeColumn.setCellValueFactory(new PropertyValueFactory<>(FILE_SIZE));
+        createdOnColumn.setCellValueFactory(new PropertyValueFactory<>(CREATED_ON));
 
         //TODO prowizorka - uładnić
-        File file = new File(System.getProperty("user.home"));
-        Arrays.stream(file.listFiles()).filter((item) -> item != null && !item.isHidden()).forEach((entry) -> {
-            FileEntry item = new FileEntry();
-            item.setCreatedOn(entry.lastModified());
-            item.setFile(entry);
-            item.setFileName(entry.getName());
-            item.setFileSize(entry.length());
-            data.add(item);
-        });
+        fillView(new File(System.getProperty(USER_HOME)));
 
+        fileView.getSortOrder().setAll(Collections.singletonList(fileNameColumn));
+    }
+
+    private void fillView(File directory) {
+        data.clear();
+        Arrays.stream(directory.listFiles()).filter((item) -> !item.isHidden()).forEach((entry) -> data.add(
+                new FileEntry()
+                        .file(entry)
+                        .fileName(entry.getName())
+                        .fileSize(entry.isDirectory() ? 0 : entry.length())
+                        .createdOn(entry.lastModified())));
         fileView.setItems(data);
-
-        fileView.getSortOrder().setAll(fileNameColumn);
-
     }
 
     @Override
     public void update(Observable o, Object arg) {
-        fileNameColumn.setText(translate("fileName"));
-        fileSizeColumn.setText(translate("fileSize"));
-        createdOnColumn.setText(translate("createdOn"));
-
+        fileNameColumn.setText(translate(FILE_NAME));
+        fileSizeColumn.setText(translate(FILE_SIZE));
+        createdOnColumn.setText(translate(CREATED_ON));
     }
 }

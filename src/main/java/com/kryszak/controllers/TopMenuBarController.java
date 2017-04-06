@@ -12,6 +12,18 @@ import static com.kryszak.language.StringUtilities.translate;
 
 public class TopMenuBarController implements Observer {
 
+    private static final String CLOSE_OPTION = "closeOption";
+
+    private static final String ENGLISH_OPTION = "englishOption";
+
+    private static final String POLISH_OPTION = "polishOption";
+
+    private static final String FILE_MENU = "fileMenu";
+
+    private static final String OPTIONS_MENU = "optionsMenu";
+
+    private static final String SELECT_LANGUAGE_OPTION = "selectLanguageOption";
+
     @FXML
     private MenuItem closeMenuOption;
 
@@ -41,11 +53,11 @@ public class TopMenuBarController implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        closeMenuOption.setText(translate("closeOption"));
-        englishOption.setText(translate("englishOption"));
-        polishOption.setText(translate("polishOption"));
-        fileMenu.setText(translate("fileMenu"));
-        optionMenu.setText(translate("optionsMenu"));
-        selectLanguageSubMenu.setText(translate("selectLanguageOption"));
+        closeMenuOption.setText(translate(CLOSE_OPTION));
+        englishOption.setText(translate(ENGLISH_OPTION));
+        polishOption.setText(translate(POLISH_OPTION));
+        fileMenu.setText(translate(FILE_MENU));
+        optionMenu.setText(translate(OPTIONS_MENU));
+        selectLanguageSubMenu.setText(translate(SELECT_LANGUAGE_OPTION));
     }
 }

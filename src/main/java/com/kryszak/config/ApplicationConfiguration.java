@@ -17,9 +17,13 @@ public class ApplicationConfiguration {
         }
     }
 
-    public static String getProperty(String key) throws IOException {
+    public static String getProperty(String key) {
         if (properties == null) {
-            loadProperties();
+            try {
+                loadProperties();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return properties.getProperty(key);
     }
