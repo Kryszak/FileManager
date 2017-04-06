@@ -3,17 +3,15 @@ package com.kryszak.controllers;
 import com.kryszak.language.LanguageManager;
 import javafx.fxml.FXML;
 
-import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
 
-
-public class MainController implements Observer {
-
+public class FileActionsButtonsController implements Observer {
 
     @FXML
-    private void initialize() throws IOException {
+    private void initialize() {
         LanguageManager.getInstance().addObserver(this);
+
     }
 
     @Override
