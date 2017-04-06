@@ -1,20 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
-<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1">
-   <top>
-      <Label fx:id="testLabel" text="%test" BorderPane.alignment="CENTER" />
-   </top>
-   <bottom>
-      <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-        <buttons>
-          <Button fx:id="plButton" alignment="CENTER" mnemonicParsing="false" text="PL" />
-            <Button fx:id="enButton" mnemonicParsing="false" text="EN" />
-        </buttons>
-      </ButtonBar>
-   </bottom>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="431.0" prefWidth="653.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1">
+    <top>
+        <MenuBar BorderPane.alignment="CENTER">
+            <menus>
+                <Menu fx:id="fileMenu" mnemonicParsing="false" text="%fileMenu">
+                    <items>
+                        <MenuItem fx:id="closeMenuOption" mnemonicParsing="false" text="%closeOption" />
+                    </items>
+                </Menu>
+                <Menu fx:id="optionMenu" mnemonicParsing="false" text="%optionsMenu">
+                    <Menu fx:id="selectLanguageSubMenu" mnemonicParsing="false" text="%selectLanguageOption">
+                        <items>
+                            <MenuItem fx:id="englishOption" mnemonicParsing="false" text="%englishOption" />
+                            <MenuItem fx:id="polishOption" mnemonicParsing="false" text="%polishOption" />
+                        </items>
+                    </Menu>
+                </Menu>
+            </menus>
+        </MenuBar>
+    </top>
+    <center>
+        <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <top>
+                <ButtonBar prefHeight="40.0" prefWidth="200.0">
+                    <buttons>
+                        <Button mnemonicParsing="false" text="Button" />
+                        <Button mnemonicParsing="false" text="Button" />
+                        <Button mnemonicParsing="false" text="Button" />
+                    </buttons>
+                    <BorderPane.margin>
+                        <Insets right="10.0" />
+                    </BorderPane.margin>
+                </ButtonBar>
+            </top>
+            <BorderPane.margin>
+                <Insets />
+            </BorderPane.margin>
+            <center>
+                <SplitPane prefHeight="200.0" prefWidth="653.0" BorderPane.alignment="CENTER">
+                    <items>
+                        <SplitPane dividerPositions="0.5" prefHeight="200.0" prefWidth="200.0">
+                            <items>
+                                <TableView fx:id="leftFileView" prefHeight="200.0" prefWidth="200.0">
+                                    <columns>
+                                        <TableColumn fx:id="fileNameColumnLeft" prefWidth="100.0" text="%fileName" />
+                                        <TableColumn fx:id="fileSizeColumnLeft" prefWidth="100.0" text="%fileSize" />
+                                        <TableColumn fx:id="createdOnColumnLeft" prefWidth="122.0" text="%createdOn" />
+                                    </columns>
+                                </TableView>
+                                <TableView fx:id="rightFileView" prefHeight="200.0" prefWidth="200.0">
+                                    <columns>
+                                        <TableColumn fx:id="fileNameColumnRight" prefWidth="100.0" text="%fileName" />
+                                        <TableColumn fx:id="fileSizeColumnRight" prefWidth="100.0" text="%fileSize" />
+                                        <TableColumn fx:id="createdOnColumnRight" prefWidth="121.0" text="%createdOn" />
+                                    </columns>
+                                </TableView>
+                            </items>
+                        </SplitPane>
+                    </items>
+                </SplitPane>
+            </center>
+        </BorderPane>
+    </center>
 </BorderPane>

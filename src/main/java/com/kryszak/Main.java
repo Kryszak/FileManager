@@ -1,13 +1,14 @@
 package com.kryszak;
 
+import com.kryszak.controllers.SingletonControllerFactory;
 import com.kryszak.language.LanguageManager;
-import com.kryszak.main.MainController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 
 public class Main extends Application {
@@ -16,12 +17,10 @@ public class Main extends Application {
 
     private FXMLLoader loader;
 
-    public static MainController mainController = new MainController();
-
     public void start(Stage primaryStage) throws IOException {
         loader = new FXMLLoader(getClass().getResource("/fxml/MainLayout.fxml"));
         loader.setResources(LanguageManager.getInstance().getResources());
-        loader.setController(mainController);
+        loader.setController(SingletonControllerFactory.getMainController());
 
         Parent root = loader.load();
 

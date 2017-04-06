@@ -1,7 +1,7 @@
 package com.kryszak.language;
 
 
-import com.kryszak.Main;
+import com.kryszak.controllers.SingletonControllerFactory;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -28,7 +28,7 @@ public class LanguageManager extends Observable {
     private LanguageManager() {
         initializeLocales();
         this.resources = ResourceBundle.getBundle(BUNDLE_NAME, this.getSelectedLocale());
-        this.addObserver(Main.mainController);
+        this.addObserver(SingletonControllerFactory.getMainController());
     }
     private void initializeLocales() {
         this.locales = new HashMap<>();
