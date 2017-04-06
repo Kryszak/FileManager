@@ -29,7 +29,7 @@ public class FileTableViewController implements Observer {
 
     private static final String USER_HOME = "user.home";
 
-    private final ObservableList<FileEntry> data =
+    private ObservableList<FileEntry> data =
             FXCollections.observableArrayList();
 
     @FXML
