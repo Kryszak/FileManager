@@ -73,14 +73,8 @@ public class FileTableViewController implements Observer {
     private void fillView() {
         data.clear();
         Arrays.stream(currentDirectory.listFiles()).filter((entry) -> !entry.isHidden()).forEach((entry) -> data.add(
-                new FileEntry()
-                        .file(entry)
-                        .fileName(entry.getName())
-                        .fileSize(entry.isDirectory() ? 0 : entry.length())
-                        .createdOn(entry.lastModified())));
-        data.add(new FileEntry()
-                .file(currentDirectory.getParentFile())
-                .fileName(PARENT_DIR_NAME));
+                new FileEntry().file(entry)));
+        data.add(new FileEntry().file(currentDirectory.getParentFile()).fileName(PARENT_DIR_NAME));
         fileView.setItems(data);
         sortView();
     }
@@ -114,7 +108,7 @@ public class FileTableViewController implements Observer {
                 changeCurrentDirectory(rowData.getFile());
                 fillView();
             }
-        } else if(event.getCode().equals(KeyCode.DELETE)) {
+        } else if (event.getCode().equals(KeyCode.DELETE)) {
             //TODO handle deleting files/directories
             System.out.println("you are deleting " + rowData.getFileName());
         }

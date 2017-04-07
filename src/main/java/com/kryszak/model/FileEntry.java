@@ -29,21 +29,20 @@ public class FileEntry {
     public File getFile() {
         return file;
     }
+
     public void setFile(File file) {
         this.file = file;
+        this.fileName.set(file.getName());
+        this.fileSize.set(file.isDirectory() ? 0 : file.length());
+        this.createdOn.set(file.lastModified());
     }
     public String getFileName() {
         return fileName.get();
     }
-    public void setFileName(String fileName) {
-        this.fileName.set(fileName);
-    }
     public long getFileSize() {
         return fileSize.get();
     }
-    public void setFileSize(long fileSize) {
-        this.fileSize.set(fileSize);
-    }
+
     public String getCreatedOn() {
         return DateFormat.getDateTimeInstance(
                 DateFormat.DEFAULT,
@@ -51,27 +50,17 @@ public class FileEntry {
                 LanguageManager.getInstance().getSelectedLocale()
         ).format(new Date(createdOn.get()));
     }
-    public void setCreatedOn(long createdOn) {
-        this.createdOn.set(createdOn);
-    }
 
     public FileEntry file(File file) {
         this.file = file;
+        this.fileName.set(file.getName());
+        this.fileSize.set(file.isDirectory() ? 0 : file.length());
+        this.createdOn.set(file.lastModified());
         return this;
     }
 
     public FileEntry fileName(String fileName) {
         this.fileName.set(fileName);
-        return this;
-    }
-
-    public FileEntry fileSize(long fileSize) {
-        this.fileSize.set(fileSize);
-        return this;
-    }
-
-    public FileEntry createdOn(long createdOn) {
-        this.createdOn.set(createdOn);
         return this;
     }
 }
