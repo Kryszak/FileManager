@@ -6,8 +6,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 import java.io.File;
 import java.util.Arrays;
@@ -28,6 +31,10 @@ public class FileTableViewController implements Observer {
     private static final String FILE_SIZE = "fileSize";
 
     private static final String USER_HOME = "user.home";
+
+    private static final int DOUBLE_CLICK = 2;
+
+    private static final String PARENT_DIR_NAME = "..";
 
     private ObservableList<FileEntry> data =
             FXCollections.observableArrayList();
@@ -52,26 +59,69 @@ public class FileTableViewController implements Observer {
 
         LanguageManager.getInstance().addObserver(this);
 
+        setRowDoubleClickListener();
+
         fileView.getColumns().forEach((column) -> column.prefWidthProperty().bind(fileView.widthProperty().multiply(TABLE_WIDTH_PERCENT)));
 
         fileNameColumn.setCellValueFactory(new PropertyValueFactory<>(FILE_NAME));
         fileSizeColumn.setCellValueFactory(new PropertyValueFactory<>(FILE_SIZE));
         createdOnColumn.setCellValueFactory(new PropertyValueFactory<>(CREATED_ON));
 
-        fillView(currentDirectory);
-
-        fileView.getSortOrder().setAll(Collections.singletonList(fileNameColumn));
+        fillView();
     }
 
-    private void fillView(File directory) {
+    private void fillView() {
         data.clear();
-        Arrays.stream(directory.listFiles()).filter((item) -> !item.isHidden()).forEach((entry) -> data.add(
+        Arrays.stream(currentDirectory.listFiles()).filter((entry) -> !entry.isHidden()).forEach((entry) -> data.add(
                 new FileEntry()
                         .file(entry)
                         .fileName(entry.getName())
                         .fileSize(entry.isDirectory() ? 0 : entry.length())
                         .createdOn(entry.lastModified())));
+        data.add(new FileEntry()
+                .file(currentDirectory.getParentFile())
+                .fileName(PARENT_DIR_NAME));
         fileView.setItems(data);
+        sortView();
+    }
+
+
+    private void sortView() {
+        fileView.getSortOrder().setAll(Collections.singletonList(fileNameColumn));
+    }
+
+    private void setRowDoubleClickListener() {
+        fileView.setRowFactory(rowFactory -> {
+            TableRow<FileEntry> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == DOUBLE_CLICK && (!row.isEmpty())) {
+                    FileEntry rowData = row.getItem();
+                    if (rowData.getFile().isDirectory()) {
+                        changeCurrentDirectory(rowData.getFile());
+                        fillView();
+                    }
+                }
+            });
+            return row;
+        });
+    }
+
+    @FXML
+    private void onKeyPressed(KeyEvent event) {
+        FileEntry rowData = fileView.getSelectionModel().getSelectedItem();
+        if (event.getCode().equals(KeyCode.ENTER)) {
+            if (rowData.getFile().isDirectory()) {
+                changeCurrentDirectory(rowData.getFile());
+                fillView();
+            }
+        } else if(event.getCode().equals(KeyCode.DELETE)) {
+            //TODO handle deleting files/directories
+            System.out.println("you are deleting " + rowData.getFileName());
+        }
+    }
+
+    private void changeCurrentDirectory(File file) {
+        currentDirectory = file;
     }
 
     @Override
@@ -79,6 +129,6 @@ public class FileTableViewController implements Observer {
         fileNameColumn.setText(translate(FILE_NAME));
         fileSizeColumn.setText(translate(FILE_SIZE));
         createdOnColumn.setText(translate(CREATED_ON));
-        fillView(currentDirectory);
+        fillView();
     }
 }
