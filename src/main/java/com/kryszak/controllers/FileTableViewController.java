@@ -92,7 +92,6 @@ public class FileTableViewController implements Observer {
                     FileEntry rowData = row.getItem();
                     if (rowData.getFile().isDirectory()) {
                         changeCurrentDirectory(rowData.getFile());
-                        fillView();
                     }
                 }
             });
@@ -106,7 +105,6 @@ public class FileTableViewController implements Observer {
         if (event.getCode().equals(KeyCode.ENTER)) {
             if (rowData.getFile().isDirectory()) {
                 changeCurrentDirectory(rowData.getFile());
-                fillView();
             }
         } else if (event.getCode().equals(KeyCode.DELETE)) {
             //TODO handle deleting files/directories
@@ -116,6 +114,7 @@ public class FileTableViewController implements Observer {
 
     private void changeCurrentDirectory(File file) {
         currentDirectory = file;
+        fillView();
     }
 
     @Override
