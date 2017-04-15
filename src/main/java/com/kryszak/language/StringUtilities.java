@@ -1,8 +1,12 @@
 package com.kryszak.language;
 
 import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class StringUtilities {
+
+    private static final Logger LOGGER = Logger.getLogger(StringUtilities.class.getName());
 
     private static final String STRING_EMPTY = "";
 
@@ -18,7 +22,7 @@ public class StringUtilities {
         try {
             return new String(value.getBytes(ISO_8859_1), UTF_8);
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.toString(), e);
             return STRING_EMPTY;
         }
     }

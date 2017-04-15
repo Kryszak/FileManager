@@ -4,11 +4,14 @@ import com.kryszak.language.LanguageManager;
 import com.kryszak.model.FileEntry;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.DragEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
@@ -17,10 +20,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static com.kryszak.language.StringUtilities.translate;
 
 public class FileTableViewController implements Observer {
+
+    private static final Logger LOGGER = Logger.getLogger(FileTableViewController.class.getName());
 
     private static final double TABLE_WIDTH_PERCENT = 0.33;
 
@@ -40,6 +47,9 @@ public class FileTableViewController implements Observer {
             FXCollections.observableArrayList();
 
     private File currentDirectory;
+
+    @FXML
+    private Label pathLabel;
 
     @FXML
     private TableView<FileEntry> fileView;
@@ -67,7 +77,7 @@ public class FileTableViewController implements Observer {
         fileSizeColumn.setCellValueFactory(new PropertyValueFactory<>(FILE_SIZE));
         createdOnColumn.setCellValueFactory(new PropertyValueFactory<>(CREATED_ON));
 
-        fillView();
+        changeCurrentDirectory(this.currentDirectory);
     }
 
     private void fillView() {
@@ -87,6 +97,7 @@ public class FileTableViewController implements Observer {
     private void setRowDoubleClickListener() {
         fileView.setRowFactory(rowFactory -> {
             TableRow<FileEntry> row = new TableRow<>();
+
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == DOUBLE_CLICK && (!row.isEmpty())) {
                     FileEntry rowData = row.getItem();
@@ -95,6 +106,19 @@ public class FileTableViewController implements Observer {
                     }
                 }
             });
+
+            row.setOnDragDetected(event -> {
+                LOGGER.log(Level.INFO, "Started dragging {0}",  event.getSource());
+            });
+
+            row.setOnDragOver(event -> {
+                LOGGER.log(Level.INFO, "Dragged over {0}", event.getSource());
+            });
+
+            row.setOnDragDropped(event -> {
+                LOGGER.log(Level.INFO, "Drag dropped on {0}", event.getSource());
+            });
+
             return row;
         });
     }
@@ -108,12 +132,16 @@ public class FileTableViewController implements Observer {
             }
         } else if (event.getCode().equals(KeyCode.DELETE)) {
             //TODO handle deleting files/directories
-            System.out.println("you are deleting " + rowData.getFileName());
+            LOGGER.log(Level.INFO, "you are deleting {0}", rowData.getFileName());
+        } else if (event.getCode().equals(KeyCode.F2)) {
+            //TODO handle file rename
+            LOGGER.log(Level.INFO, "you are renaming {0}", rowData.getFileName());
         }
     }
 
     private void changeCurrentDirectory(File file) {
         currentDirectory = file;
+        pathLabel.setText(file.getAbsolutePath());
         fillView();
     }
 

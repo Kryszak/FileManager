@@ -3,8 +3,12 @@ package com.kryszak.config;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ApplicationConfiguration {
+
+    private static final Logger LOGGER = Logger.getLogger(ApplicationConfiguration.class.getName());
 
     private static final String PROPERTY_FILE = "application.properties";
 
@@ -22,7 +26,7 @@ public class ApplicationConfiguration {
             try {
                 loadProperties();
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, e.toString(), e);
             }
         }
         return properties.getProperty(key);
