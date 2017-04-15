@@ -7,18 +7,19 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import java.io.File;
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.Date;
 
-public class FileEntry {
+public class FileEntry implements Serializable {
 
     private File file;
 
-    private StringProperty fileName;
+    transient private StringProperty fileName;
 
-    private LongProperty fileSize;
+    transient private LongProperty fileSize;
 
-    private LongProperty createdOn;
+    transient private LongProperty createdOn;
 
     public FileEntry() {
         fileName = new SimpleStringProperty();
@@ -62,5 +63,12 @@ public class FileEntry {
     public FileEntry fileName(String fileName) {
         this.fileName.set(fileName);
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "filename=[" + file.getName() + "],"
+                + "fileSize=[" + file.length() + "]"
+                + "createdOn=[" + file.lastModified() + "]";
     }
 }

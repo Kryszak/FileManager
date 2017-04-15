@@ -28,4 +28,7 @@
             </center>
         </BorderPane>
     </center>
+    <bottom>
+        <fx:include source="ShortcutsLabels.fxml"/>
+    </bottom>
 </BorderPane>

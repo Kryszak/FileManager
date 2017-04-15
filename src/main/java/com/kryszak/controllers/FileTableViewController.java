@@ -4,16 +4,18 @@ import com.kryszak.language.LanguageManager;
 import com.kryszak.model.FileEntry;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.DragEvent;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.TransferMode;
 
 import java.io.File;
 import java.util.Arrays;
@@ -43,6 +45,8 @@ public class FileTableViewController implements Observer {
 
     private static final String PARENT_DIR_NAME = "..";
 
+    private static final DataFormat FILE_ENTRY_DATA_TYPE = new DataFormat("com.kryszak.model.FileEntry");
+
     private ObservableList<FileEntry> data =
             FXCollections.observableArrayList();
 
@@ -69,7 +73,7 @@ public class FileTableViewController implements Observer {
 
         LanguageManager.getInstance().addObserver(this);
 
-        setRowDoubleClickListener();
+        setTableRowListeners();
 
         fileView.getColumns().forEach((column) -> column.prefWidthProperty().bind(fileView.widthProperty().multiply(TABLE_WIDTH_PERCENT)));
 
@@ -94,7 +98,7 @@ public class FileTableViewController implements Observer {
         fileView.getSortOrder().setAll(Collections.singletonList(fileNameColumn));
     }
 
-    private void setRowDoubleClickListener() {
+    private void setTableRowListeners() {
         fileView.setRowFactory(rowFactory -> {
             TableRow<FileEntry> row = new TableRow<>();
 
@@ -108,15 +112,31 @@ public class FileTableViewController implements Observer {
             });
 
             row.setOnDragDetected(event -> {
-                LOGGER.log(Level.INFO, "Started dragging {0}",  event.getSource());
+                LOGGER.log(Level.INFO, "Started dragging {0}", event.getSource());
+                FileEntry rowData = row.getItem();
+                Dragboard db = row.startDragAndDrop(TransferMode.ANY);
+                db.setDragView(row.snapshot(null, null));
+                ClipboardContent cc = new ClipboardContent();
+                cc.put(FILE_ENTRY_DATA_TYPE, rowData);
+                db.setContent(cc);
+                event.consume();
             });
 
             row.setOnDragOver(event -> {
-                LOGGER.log(Level.INFO, "Dragged over {0}", event.getSource());
+                if (event.getDragboard().hasContent(FILE_ENTRY_DATA_TYPE)) {
+                    event.acceptTransferModes(TransferMode.ANY);
+                }
+                event.consume();
             });
 
             row.setOnDragDropped(event -> {
                 LOGGER.log(Level.INFO, "Drag dropped on {0}", event.getSource());
+                Dragboard db = event.getDragboard();
+                if (db.hasContent(FILE_ENTRY_DATA_TYPE)) {
+                    LOGGER.log(Level.INFO, "Drag content {0}", db.getContent(FILE_ENTRY_DATA_TYPE));
+                    event.setDropCompleted(true);
+                    event.consume();
+                }
             });
 
             return row;
@@ -136,6 +156,12 @@ public class FileTableViewController implements Observer {
         } else if (event.getCode().equals(KeyCode.F2)) {
             //TODO handle file rename
             LOGGER.log(Level.INFO, "you are renaming {0}", rowData.getFileName());
+        } else if (event.getCode().equals(KeyCode.C) && event.isControlDown()) {
+            //TODO copy file
+            LOGGER.log(Level.INFO, "you are copying {0}", rowData.getFileName());
+        } else if (event.getCode().equals(KeyCode.V) && event.isControlDown()) {
+            //TODO paste copied file to source
+            LOGGER.log(Level.INFO, "you are pasting {0}", event.getSource());
         }
     }
 
