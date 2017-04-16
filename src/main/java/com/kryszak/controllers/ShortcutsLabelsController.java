@@ -18,9 +18,6 @@ public class ShortcutsLabelsController implements Observer {
     private Label pasteLabel;
 
     @FXML
-    private Label renameLabel;
-
-    @FXML
     private Label deleteLabel;
 
     @FXML
@@ -32,7 +29,6 @@ public class ShortcutsLabelsController implements Observer {
     public void update(Observable o, Object arg) {
         copyLabel.setText(translate("copy"));
         pasteLabel.setText(translate("paste"));
-        renameLabel.setText(translate("rename"));
         deleteLabel.setText(translate("delete"));
     }
 }

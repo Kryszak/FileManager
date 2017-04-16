@@ -67,8 +67,9 @@ public class FileEntry implements Serializable {
 
     @Override
     public String toString() {
-        return "filename=[" + file.getName() + "],"
-                + "fileSize=[" + file.length() + "]"
-                + "createdOn=[" + file.lastModified() + "]";
+        return  "FileEntry=(" +
+                "filename=[" + file.getName() + "], "
+                + "fileSize=[" + file.length() + "], "
+                + "createdOn=[" + file.lastModified() + "])";
     }
 }
