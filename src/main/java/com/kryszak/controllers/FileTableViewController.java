@@ -2,6 +2,7 @@ package com.kryszak.controllers;
 
 import com.kryszak.language.LanguageManager;
 import com.kryszak.model.FileEntry;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -140,19 +141,22 @@ public class FileTableViewController implements Observer {
                     FileEntry draggedFile = (FileEntry) dragboard.getContent(FILE_ENTRY_DATA_TYPE);
                     File file = draggedFile.getFile();
                     File destinationDir = row.getItem().getFile();
-                    try {
-                        //TODO progress bar
-                        if (file.isDirectory()) {
-                            FileUtils.moveDirectoryToDirectory(file, destinationDir, false);
-                        } else {
-                            FileUtils.moveFileToDirectory(file, destinationDir, false);
+                    Platform.runLater(() -> {
+                        try {
+                            //TODO progress bar
+                            if (file.isDirectory()) {
+                                FileUtils.moveDirectoryToDirectory(file, destinationDir, false);
+                            } else {
+                                FileUtils.moveFileToDirectory(file, destinationDir, false);
+                            }
+                        } catch (IOException e) {
+                            LOGGER.log(Level.SEVERE, e.toString(), e);
                         }
-                    } catch (IOException e) {
-                        LOGGER.log(Level.SEVERE, e.toString(), e);
-                    }
+                        //TODO update source fileView in case of moving from other
+                        fillView();
+                    });
                     event.setDropCompleted(true);
                     event.consume();
-                    fillView();
                 }
             });
 
@@ -161,38 +165,47 @@ public class FileTableViewController implements Observer {
     }
 
     @FXML
-    private void onKeyPressed(KeyEvent event) throws IOException {
+    private void onKeyPressed(KeyEvent event) {
         FileEntry rowData = fileView.getSelectionModel().getSelectedItem();
         if (event.getCode().equals(KeyCode.ENTER)) {
             if (rowData.getFile().isDirectory()) {
                 changeCurrentDirectory(rowData.getFile());
             }
         } else if (event.getCode().equals(KeyCode.DELETE)) {
-            //TODO progress bar
+
             Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
             dialog.setHeaderText(translate("confirm"));
             dialog.setTitle(translate("confirm"));
             dialog.setContentText(String.format(translate("deleteDialogContent"), rowData.getFile().getName()));
             Button cancel = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL);
             cancel.setText(translate("cancelOption"));
-            final Optional<ButtonType> result =  dialog.showAndWait();
-            if(result.get().equals(ButtonType.OK)){
-                if(rowData.getFile().isDirectory()){
-                    FileUtils.deleteDirectory(rowData.getFile());
-                } else {
-                    FileUtils.deleteQuietly(rowData.getFile());
-                }
-                fillView();
+            final Optional<ButtonType> result = dialog.showAndWait();
+
+            if (result.get().equals(ButtonType.OK)) {
+                //TODO progress bar
+                Platform.runLater(() -> {
+                    if (rowData.getFile().isDirectory()) {
+                        try {
+                            FileUtils.deleteDirectory(rowData.getFile());
+                        } catch (IOException e) {
+                            LOGGER.log(Level.SEVERE, e.toString(), e);
+                        }
+                    } else {
+                        FileUtils.deleteQuietly(rowData.getFile());
+                    }
+                    fillView();
+                });
             }
         } else if (event.getCode().equals(KeyCode.F2)) {
             //TODO handle file rename NICE TO HAVE
             LOGGER.log(Level.INFO, "you are renaming {0}", rowData.getFileName());
         } else if (event.getCode().equals(KeyCode.C) && event.isControlDown()) {
-            //TODO copy file
+            //TODO copy file to 'clipboard'
             LOGGER.log(Level.INFO, "you are copying {0}", rowData.getFileName());
         } else if (event.getCode().equals(KeyCode.V) && event.isControlDown()) {
             //TODO paste copied file to source
             LOGGER.log(Level.INFO, "you are pasting {0}", event.getSource());
+            Platform.runLater(() -> {});
         }
     }
 
