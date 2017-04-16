@@ -2,6 +2,7 @@ package com.kryszak.controllers;
 
 import com.kryszak.language.LanguageManager;
 import com.kryszak.model.FileEntry;
+import com.kryszak.operations.FileClipboard;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -196,16 +197,27 @@ public class FileTableViewController implements Observer {
                     fillView();
                 });
             }
-        } else if (event.getCode().equals(KeyCode.F2)) {
-            //TODO handle file rename NICE TO HAVE
-            LOGGER.log(Level.INFO, "you are renaming {0}", rowData.getFileName());
         } else if (event.getCode().equals(KeyCode.C) && event.isControlDown()) {
-            //TODO copy file to 'clipboard'
-            LOGGER.log(Level.INFO, "you are copying {0}", rowData.getFileName());
+            FileClipboard.storeFileEntry(rowData);
         } else if (event.getCode().equals(KeyCode.V) && event.isControlDown()) {
-            //TODO paste copied file to source
-            LOGGER.log(Level.INFO, "you are pasting {0}", event.getSource());
-            Platform.runLater(() -> {});
+            FileEntry storedEntry = FileClipboard.getStoredFileEntry();
+            //TODO progress bar
+            Platform.runLater(() -> {
+                if(storedEntry.getFile().isDirectory()){
+                    try {
+                        FileUtils.copyDirectoryToDirectory(storedEntry.getFile(), currentDirectory);
+                    } catch (IOException e) {
+                        LOGGER.log(Level.SEVERE, e.toString(), e);
+                    }
+                } else {
+                    try {
+                        FileUtils.copyFileToDirectory(storedEntry.getFile(), currentDirectory);
+                    } catch (IOException e) {
+                        LOGGER.log(Level.SEVERE, e.toString(), e);
+                    }
+                }
+                fillView();
+            });
         }
     }
 
