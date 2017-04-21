@@ -5,6 +5,8 @@
     <artifactId>filemanager</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <packaging>jar</packaging>
+
     <dependencies>
         <dependency>
             <groupId>commons-io</groupId>
@@ -14,6 +16,7 @@
     </dependencies>
 
     <build>
+        <finalName>FileManager</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -25,25 +28,26 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.6</version>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.0.0</version>
                 <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <mainClass>com.kryszak.Main</mainClass>
                         </manifest>
                     </archive>
+                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>assemble-all</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>shade</goal>
+                            <goal>single</goal>
                         </goals>
                     </execution>
                 </executions>

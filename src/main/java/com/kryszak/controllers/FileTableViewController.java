@@ -2,8 +2,10 @@ package com.kryszak.controllers;
 
 import com.kryszak.language.LanguageManager;
 import com.kryszak.model.FileEntry;
+import com.kryszak.operations.CopyOperation;
+import com.kryszak.operations.DeleteOperation;
 import com.kryszak.operations.FileClipboard;
-import javafx.application.Platform;
+import com.kryszak.operations.MoveOperation;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -21,23 +23,17 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static com.kryszak.language.StringUtilities.translate;
 
 public class FileTableViewController implements Observer {
-
-    private static final Logger LOGGER = Logger.getLogger(FileTableViewController.class.getName());
 
     private static final double TABLE_WIDTH_PERCENT = 0.33;
 
@@ -54,6 +50,12 @@ public class FileTableViewController implements Observer {
     private static final String PARENT_DIR_NAME = "..";
 
     private static final DataFormat FILE_ENTRY_DATA_TYPE = new DataFormat("com.kryszak.model.FileEntry");
+
+    private static final String CONFIRM = "confirm";
+
+    private static final String DELETE_DIALOG_CONTENT = "deleteDialogContent";
+
+    private static final String CANCEL_OPTION = "cancelOption";
 
     private ObservableList<FileEntry> data =
             FXCollections.observableArrayList();
@@ -121,11 +123,13 @@ public class FileTableViewController implements Observer {
 
             row.setOnDragDetected(event -> {
                 FileEntry rowData = row.getItem();
-                Dragboard dragboard = row.startDragAndDrop(TransferMode.ANY);
-                dragboard.setDragView(row.snapshot(null, null));
-                ClipboardContent clipboardContent = new ClipboardContent();
-                clipboardContent.put(FILE_ENTRY_DATA_TYPE, rowData);
-                dragboard.setContent(clipboardContent);
+                if (rowData != null) {
+                    Dragboard dragboard = row.startDragAndDrop(TransferMode.ANY);
+                    dragboard.setDragView(row.snapshot(null, null));
+                    ClipboardContent clipboardContent = new ClipboardContent();
+                    clipboardContent.put(FILE_ENTRY_DATA_TYPE, rowData);
+                    dragboard.setContent(clipboardContent);
+                }
                 event.consume();
             });
 
@@ -141,21 +145,22 @@ public class FileTableViewController implements Observer {
                 if (dragboard.hasContent(FILE_ENTRY_DATA_TYPE)) {
                     FileEntry draggedFile = (FileEntry) dragboard.getContent(FILE_ENTRY_DATA_TYPE);
                     File file = draggedFile.getFile();
-                    File destinationDir = row.getItem().getFile();
-                    Platform.runLater(() -> {
-                        try {
-                            //TODO progress bar
-                            if (file.isDirectory()) {
-                                FileUtils.moveDirectoryToDirectory(file, destinationDir, false);
-                            } else {
-                                FileUtils.moveFileToDirectory(file, destinationDir, false);
-                            }
-                        } catch (IOException e) {
-                            LOGGER.log(Level.SEVERE, e.toString(), e);
-                        }
-                        //TODO update source fileView in case of moving from other
-                        fillView();
-                    });
+                    File destinationDir;
+                    if (row.getItem() == null) {
+                        destinationDir = currentDirectory;
+                    } else {
+                        destinationDir = row.getItem().getFile();
+                    }
+
+                    MoveOperation moveOperation = new MoveOperation(file, destinationDir);
+
+                    moveOperation.setOnSucceeded(event1 -> fillView());
+                    moveOperation.setOnFailed(event1 -> fillView());
+                    moveOperation.setOnCancelled(event1 -> fillView());
+                    //TODO update source fileView in case of moving from other
+
+                    new Thread(moveOperation).start();
+
                     event.setDropCompleted(true);
                     event.consume();
                 }
@@ -175,49 +180,34 @@ public class FileTableViewController implements Observer {
         } else if (event.getCode().equals(KeyCode.DELETE)) {
 
             Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
-            dialog.setHeaderText(translate("confirm"));
-            dialog.setTitle(translate("confirm"));
-            dialog.setContentText(String.format(translate("deleteDialogContent"), rowData.getFile().getName()));
+            dialog.setHeaderText(translate(CONFIRM));
+            dialog.setTitle(translate(CONFIRM));
+            dialog.setContentText(String.format(translate(DELETE_DIALOG_CONTENT), rowData.getFile().getName()));
             Button cancel = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL);
-            cancel.setText(translate("cancelOption"));
+            cancel.setText(translate(CANCEL_OPTION));
             final Optional<ButtonType> result = dialog.showAndWait();
 
             if (result.get().equals(ButtonType.OK)) {
-                //TODO progress bar
-                Platform.runLater(() -> {
-                    if (rowData.getFile().isDirectory()) {
-                        try {
-                            FileUtils.deleteDirectory(rowData.getFile());
-                        } catch (IOException e) {
-                            LOGGER.log(Level.SEVERE, e.toString(), e);
-                        }
-                    } else {
-                        FileUtils.deleteQuietly(rowData.getFile());
-                    }
-                    fillView();
-                });
+                DeleteOperation deleteOperation = new DeleteOperation(rowData.getFile());
+
+                deleteOperation.setOnSucceeded(event1 -> fillView());
+                deleteOperation.setOnFailed(event1 -> fillView());
+                deleteOperation.setOnCancelled(event1 -> fillView());
+
+                new Thread(deleteOperation).start();
             }
         } else if (event.getCode().equals(KeyCode.C) && event.isControlDown()) {
             FileClipboard.storeFileEntry(rowData);
         } else if (event.getCode().equals(KeyCode.V) && event.isControlDown()) {
             FileEntry storedEntry = FileClipboard.getStoredFileEntry();
-            //TODO progress bar
-            Platform.runLater(() -> {
-                if(storedEntry.getFile().isDirectory()){
-                    try {
-                        FileUtils.copyDirectoryToDirectory(storedEntry.getFile(), currentDirectory);
-                    } catch (IOException e) {
-                        LOGGER.log(Level.SEVERE, e.toString(), e);
-                    }
-                } else {
-                    try {
-                        FileUtils.copyFileToDirectory(storedEntry.getFile(), currentDirectory);
-                    } catch (IOException e) {
-                        LOGGER.log(Level.SEVERE, e.toString(), e);
-                    }
-                }
-                fillView();
-            });
+
+            CopyOperation copyOperation = new CopyOperation(storedEntry.getFile(), currentDirectory);
+            copyOperation.setOnSucceeded(event1 -> fillView());
+            copyOperation.setOnFailed(event1 -> fillView());
+            copyOperation.setOnCancelled(event1 -> fillView());
+
+            new Thread(copyOperation).start();
+
         }
     }
 

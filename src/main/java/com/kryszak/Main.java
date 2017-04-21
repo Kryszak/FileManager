@@ -24,7 +24,6 @@ public class Main extends Application {
     private FXMLLoader loader;
 
     public void start(Stage primaryStage) throws IOException {
-        setUserAgentStylesheet(STYLESHEET_MODENA);
         loader = new FXMLLoader(getClass().getResource(MAIN_LAYOUT_FXML));
         loader.setResources(LanguageManager.getInstance().getResources());
 
