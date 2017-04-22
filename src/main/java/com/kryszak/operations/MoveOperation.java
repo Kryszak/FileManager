@@ -15,7 +15,7 @@ public class MoveOperation extends FileOperation {
 
     private final File destinationDir;
 
-    public MoveOperation(File sourceFile, File destinationDir) {
+    public MoveOperation(File sourceFile, File destinationDir) throws IOException {
         this.sourceFile = sourceFile;
         this.destinationDir = destinationDir;
     }
@@ -23,9 +23,9 @@ public class MoveOperation extends FileOperation {
     @Override
     protected Void call() throws Exception {
         try {
-            //TODO progress bar
             if (sourceFile.isDirectory()) {
                 Collection<File> files = FileUtils.listFiles(sourceFile, null, true);
+                totalFiles = files.size();
                 files.forEach((file) -> {
                     String path = file.getAbsolutePath().replace(sourceFile.getAbsolutePath() + separator, EMPTY);
                     try {

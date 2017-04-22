@@ -25,15 +25,20 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static com.kryszak.language.StringUtilities.translate;
 
 public class FileTableViewController implements Observer {
+
+    private static final Logger LOGGER = Logger.getLogger(FileTableViewController.class.getName());
 
     private static final double TABLE_WIDTH_PERCENT = 0.33;
 
@@ -152,12 +157,17 @@ public class FileTableViewController implements Observer {
                         destinationDir = row.getItem().getFile();
                     }
 
-                    MoveOperation moveOperation = new MoveOperation(file, destinationDir);
+                    MoveOperation moveOperation = null;
+                    try {
+                        moveOperation = new MoveOperation(file, destinationDir);
+                    } catch (IOException e) {
+                        LOGGER.log(Level.SEVERE, e.toString(), e);
+                    }
 
                     moveOperation.setOnSucceeded(event1 -> fillView());
                     moveOperation.setOnFailed(event1 -> fillView());
                     moveOperation.setOnCancelled(event1 -> fillView());
-                    //TODO update source fileView in case of moving from other
+                    //TODO update source fileView in case of moving from other - watchdirtask
 
                     new Thread(moveOperation).start();
 
@@ -171,7 +181,7 @@ public class FileTableViewController implements Observer {
     }
 
     @FXML
-    private void onKeyPressed(KeyEvent event) {
+    private void onKeyPressed(KeyEvent event) throws IOException {
         FileEntry rowData = fileView.getSelectionModel().getSelectedItem();
         if (event.getCode().equals(KeyCode.ENTER)) {
             if (rowData.getFile().isDirectory()) {

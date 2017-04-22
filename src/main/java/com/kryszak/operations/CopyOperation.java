@@ -1,5 +1,6 @@
 package com.kryszak.operations;
 
+import com.kryszak.model.ProgressDialog;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -15,7 +16,7 @@ public class CopyOperation extends FileOperation {
 
     private final File destinationDir;
 
-    public CopyOperation(File sourceFile, File destinationDir) {
+    public CopyOperation(File sourceFile, File destinationDir) throws IOException {
         this.sourceFile = sourceFile;
         this.destinationDir = destinationDir;
     }
@@ -23,7 +24,6 @@ public class CopyOperation extends FileOperation {
     @Override
     protected Void call() throws Exception {
         try {
-            //TODO progress bar
             if (sourceFile.isDirectory()) {
                 Collection<File> files = FileUtils.listFiles(sourceFile, null, true);
                 totalFiles = files.size();

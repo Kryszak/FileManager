@@ -21,10 +21,8 @@ public class Main extends Application {
 
     private static final int MIN_WIDTH = 800;
 
-    private FXMLLoader loader;
-
     public void start(Stage primaryStage) throws IOException {
-        loader = new FXMLLoader(getClass().getResource(MAIN_LAYOUT_FXML));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(MAIN_LAYOUT_FXML));
         loader.setResources(LanguageManager.getInstance().getResources());
 
         Parent root = loader.load();

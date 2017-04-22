@@ -1,6 +1,8 @@
 package com.kryszak.controllers;
 
 import com.kryszak.language.LanguageManager;
+import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
@@ -21,6 +23,15 @@ public class ProgressDialogController implements Observer {
     @FXML
     private void initialize() {
         LanguageManager.getInstance().addObserver(this);
+    }
+
+    public void registerOperation(Task<Void> task) {
+        progressBar.progressProperty().bind(task.progressProperty());
+        cancelButton.setOnAction(event -> {
+            if (task.getState() == Worker.State.RUNNING) {
+                task.cancel();
+            }
+        });
     }
 
     @Override

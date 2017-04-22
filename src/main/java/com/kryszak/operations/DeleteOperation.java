@@ -11,14 +11,13 @@ public class DeleteOperation extends FileOperation {
 
     private final File sourceFile;
 
-    public DeleteOperation(File sourceFile) {
+    public DeleteOperation(File sourceFile) throws IOException {
         this.sourceFile = sourceFile;
     }
 
     @Override
     protected Void call() throws Exception {
         try {
-            //TODO progress bar
             if (sourceFile.isDirectory()) {
                 Collection<File> files = FileUtils.listFiles(sourceFile, null, true);
                 totalFiles = files.size();
