@@ -12,14 +12,14 @@ abstract class FileOperation extends Task<Void> {
 
     static final String EMPTY = "";
 
+    ProgressDialog dialog;
+
     int totalFiles;
 
     int currentFileNumber = 0;
 
     FileOperation() throws IOException {
-        ProgressDialog dialog = new ProgressDialog();
-        dialog.registerOperation(this);
-        dialog.show();
+        dialog = new ProgressDialog();
         this.setOnCancelled(event -> dialog.hide());
         this.setOnSucceeded(event -> dialog.hide());
         this.setOnFailed(event -> dialog.hide());

@@ -18,6 +18,8 @@ public class MoveOperation extends FileOperation {
     public MoveOperation(File sourceFile, File destinationDir) throws IOException {
         this.sourceFile = sourceFile;
         this.destinationDir = destinationDir;
+        dialog.registerOperation(this, "moveOperation");
+        dialog.show();
     }
 
     @Override

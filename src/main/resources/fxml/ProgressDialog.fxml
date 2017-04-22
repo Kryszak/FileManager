@@ -4,9 +4,9 @@
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kryszak.controllers.ProgressDialogController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kryszak.controllers.ProgressDialogController">
    <children>
-      <ProgressBar fx:id="progressBar" layoutX="24.0" layoutY="190.0" prefHeight="20.0" prefWidth="544.0" progress="0.0" />
-      <Button fx:id="cancelButton" layoutX="470.0" layoutY="360.0" mnemonicParsing="false" text="%cancelOption" />
+      <ProgressBar fx:id="progressBar" layoutX="39.0" layoutY="55.0" prefHeight="20.0" prefWidth="322.0" progress="0.0" />
+      <Button fx:id="cancelButton" layoutX="270.0" layoutY="110.0" mnemonicParsing="false" text="%cancelOption" />
    </children>
 </AnchorPane>

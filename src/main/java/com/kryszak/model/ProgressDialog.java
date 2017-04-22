@@ -14,9 +14,7 @@ import static com.kryszak.language.StringUtilities.translate;
 
 public class ProgressDialog {
 
-    private static final String PROGRESS = "progress";
-
-    private static final double MIN_HEIGHT = 300;
+    private static final double MIN_HEIGHT = 150;
 
     private static final double MIN_WIDTH = 400;
 
@@ -39,12 +37,13 @@ public class ProgressDialog {
 
         controller = loader.getController();
 
-        stage.setTitle(translate(PROGRESS));
+        stage.setResizable(false);
         stage.setScene(new Scene(root));
 
     }
 
-    public void registerOperation(Task<Void> task) {
+    public void registerOperation(Task<Void> task, String operationNameKey) {
+        stage.setTitle(translate(operationNameKey));
         stage.setOnCloseRequest(event -> task.cancel(true));
         controller.registerOperation(task);
     }

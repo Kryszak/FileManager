@@ -13,6 +13,8 @@ public class DeleteOperation extends FileOperation {
 
     public DeleteOperation(File sourceFile) throws IOException {
         this.sourceFile = sourceFile;
+        dialog.registerOperation(this, "deleteOperation");
+        dialog.show();
     }
 
     @Override

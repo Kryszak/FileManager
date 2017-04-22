@@ -18,6 +18,8 @@ public class CopyOperation extends FileOperation {
     public CopyOperation(File sourceFile, File destinationDir) throws IOException {
         this.sourceFile = sourceFile;
         this.destinationDir = destinationDir;
+        dialog.registerOperation(this, "copyOperation");
+        dialog.show();
     }
 
     @Override
@@ -33,11 +35,8 @@ public class CopyOperation extends FileOperation {
                             FileUtils.copyFileToDirectory(file, new File(destinationDir.getAbsolutePath() + separator + sourceFile.getName() + separator + path.replace(file.getName(), EMPTY)), true);
                             currentFileNumber++;
                             updateProgress(currentFileNumber, totalFiles);
-                            Thread.sleep(1000);
                         } catch (IOException e) {
                             LOGGER.log(Level.SEVERE, e.toString(), e);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
                         }
                     }
                 });
