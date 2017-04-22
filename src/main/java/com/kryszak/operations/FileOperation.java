@@ -20,7 +20,9 @@ abstract class FileOperation extends Task<Void> {
         ProgressDialog dialog = new ProgressDialog();
         dialog.registerOperation(this);
         dialog.show();
-        //TODO bind end of task to close dialog
+        this.setOnCancelled(event -> dialog.hide());
+        this.setOnSucceeded(event -> dialog.hide());
+        this.setOnFailed(event -> dialog.hide());
     }
 
 }

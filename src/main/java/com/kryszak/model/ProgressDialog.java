@@ -10,7 +10,15 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+import static com.kryszak.language.StringUtilities.translate;
+
 public class ProgressDialog {
+
+    private static final String PROGRESS = "progress";
+
+    private static final double MIN_HEIGHT = 300;
+
+    private static final double MIN_WIDTH = 400;
 
     private ProgressDialogController controller;
 
@@ -26,15 +34,18 @@ public class ProgressDialog {
 
         Parent root = loader.load();
 
+        stage.setMinHeight(MIN_HEIGHT);
+        stage.setMinWidth(MIN_WIDTH);
+
         controller = loader.getController();
 
-        //TODO title of dialog
-        stage.setTitle("%CHANGE ME%");
+        stage.setTitle(translate(PROGRESS));
         stage.setScene(new Scene(root));
 
     }
 
     public void registerOperation(Task<Void> task) {
+        stage.setOnCloseRequest(event -> task.cancel(true));
         controller.registerOperation(task);
     }
 

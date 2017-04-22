@@ -22,11 +22,15 @@ public class DeleteOperation extends FileOperation {
                 Collection<File> files = FileUtils.listFiles(sourceFile, null, true);
                 totalFiles = files.size();
                 files.forEach((file) -> {
-                    FileUtils.deleteQuietly(file);
-                    currentFileNumber++;
-                    updateProgress(currentFileNumber, totalFiles);
+                    if(!this.isCancelled()) {
+                        FileUtils.deleteQuietly(file);
+                        currentFileNumber++;
+                        updateProgress(currentFileNumber, totalFiles);
+                    }
                 });
-                FileUtils.deleteDirectory(sourceFile);
+                if(!this.isCancelled()) {
+                    FileUtils.deleteDirectory(sourceFile);
+                }
             } else {
                 totalFiles = 1;
                 FileUtils.deleteQuietly(sourceFile);

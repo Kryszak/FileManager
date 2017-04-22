@@ -1,6 +1,5 @@
 package com.kryszak.operations;
 
-import com.kryszak.model.ProgressDialog;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -28,13 +27,18 @@ public class CopyOperation extends FileOperation {
                 Collection<File> files = FileUtils.listFiles(sourceFile, null, true);
                 totalFiles = files.size();
                 files.forEach((file) -> {
-                    String path = file.getAbsolutePath().replace(sourceFile.getAbsolutePath() + separator, EMPTY);
-                    try {
-                        FileUtils.copyFileToDirectory(file, new File(destinationDir.getAbsolutePath() + separator + sourceFile.getName() + separator + path.replace(file.getName(), EMPTY)), true);
-                        currentFileNumber++;
-                        updateProgress(currentFileNumber, totalFiles);
-                    } catch (IOException e) {
-                        LOGGER.log(Level.SEVERE, e.toString(), e);
+                    if (!this.isCancelled()) {
+                        String path = file.getAbsolutePath().replace(sourceFile.getAbsolutePath() + separator, EMPTY);
+                        try {
+                            FileUtils.copyFileToDirectory(file, new File(destinationDir.getAbsolutePath() + separator + sourceFile.getName() + separator + path.replace(file.getName(), EMPTY)), true);
+                            currentFileNumber++;
+                            updateProgress(currentFileNumber, totalFiles);
+                            Thread.sleep(1000);
+                        } catch (IOException e) {
+                            LOGGER.log(Level.SEVERE, e.toString(), e);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
             } else {

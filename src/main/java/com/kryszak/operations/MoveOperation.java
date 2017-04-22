@@ -27,16 +27,20 @@ public class MoveOperation extends FileOperation {
                 Collection<File> files = FileUtils.listFiles(sourceFile, null, true);
                 totalFiles = files.size();
                 files.forEach((file) -> {
-                    String path = file.getAbsolutePath().replace(sourceFile.getAbsolutePath() + separator, EMPTY);
-                    try {
-                        FileUtils.moveFileToDirectory(file, new File(destinationDir.getAbsolutePath() + separator + sourceFile.getName() + separator + path.replace(file.getName(), EMPTY)), true);
-                        currentFileNumber++;
-                        updateProgress(currentFileNumber, totalFiles);
-                    } catch (IOException e) {
-                        LOGGER.log(Level.SEVERE, e.toString(), e);
+                    if (!this.isCancelled()) {
+                        String path = file.getAbsolutePath().replace(sourceFile.getAbsolutePath() + separator, EMPTY);
+                        try {
+                            FileUtils.moveFileToDirectory(file, new File(destinationDir.getAbsolutePath() + separator + sourceFile.getName() + separator + path.replace(file.getName(), EMPTY)), true);
+                            currentFileNumber++;
+                            updateProgress(currentFileNumber, totalFiles);
+                        } catch (IOException e) {
+                            LOGGER.log(Level.SEVERE, e.toString(), e);
+                        }
                     }
                 });
-                FileUtils.deleteQuietly(sourceFile);
+                if (!this.isCancelled()) {
+                    FileUtils.deleteQuietly(sourceFile);
+                }
             } else {
                 totalFiles = 1;
                 FileUtils.moveFileToDirectory(sourceFile, destinationDir, false);

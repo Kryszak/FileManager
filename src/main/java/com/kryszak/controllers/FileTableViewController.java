@@ -6,6 +6,7 @@ import com.kryszak.operations.CopyOperation;
 import com.kryszak.operations.DeleteOperation;
 import com.kryszak.operations.FileClipboard;
 import com.kryszak.operations.MoveOperation;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -26,6 +27,9 @@ import javafx.scene.input.TransferMode;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Observable;
@@ -35,6 +39,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.kryszak.language.StringUtilities.translate;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public class FileTableViewController implements Observer {
 
@@ -67,6 +74,12 @@ public class FileTableViewController implements Observer {
 
     private File currentDirectory;
 
+    private WatchService service;
+
+    private WatchKey watchKey;
+
+    private Thread watcherThread;
+
     @FXML
     private Label pathLabel;
 
@@ -83,7 +96,7 @@ public class FileTableViewController implements Observer {
     private TableColumn<FileEntry, Long> createdOnColumn;
 
     @FXML
-    private void initialize() {
+    private void initialize() throws IOException {
         currentDirectory = new File(System.getProperty(USER_HOME));
 
         LanguageManager.getInstance().addObserver(this);
@@ -96,7 +109,12 @@ public class FileTableViewController implements Observer {
         fileSizeColumn.setCellValueFactory(new PropertyValueFactory<>(FILE_SIZE));
         createdOnColumn.setCellValueFactory(new PropertyValueFactory<>(CREATED_ON));
 
+        service = FileSystems.getDefault().newWatchService();
+
         changeCurrentDirectory(this.currentDirectory);
+
+        setupDirectoryWatcherThread();
+
     }
 
     private void fillView() {
@@ -121,7 +139,11 @@ public class FileTableViewController implements Observer {
                 if (event.getClickCount() == DOUBLE_CLICK && (!row.isEmpty())) {
                     FileEntry rowData = row.getItem();
                     if (rowData.getFile().isDirectory()) {
-                        changeCurrentDirectory(rowData.getFile());
+                        try {
+                            changeCurrentDirectory(rowData.getFile());
+                        } catch (IOException e) {
+                            LOGGER.log(Level.SEVERE, e.toString(), e);
+                        }
                     }
                 }
             });
@@ -164,11 +186,6 @@ public class FileTableViewController implements Observer {
                         LOGGER.log(Level.SEVERE, e.toString(), e);
                     }
 
-                    moveOperation.setOnSucceeded(event1 -> fillView());
-                    moveOperation.setOnFailed(event1 -> fillView());
-                    moveOperation.setOnCancelled(event1 -> fillView());
-                    //TODO update source fileView in case of moving from other - watchdirtask
-
                     new Thread(moveOperation).start();
 
                     event.setDropCompleted(true);
@@ -200,10 +217,6 @@ public class FileTableViewController implements Observer {
             if (result.get().equals(ButtonType.OK)) {
                 DeleteOperation deleteOperation = new DeleteOperation(rowData.getFile());
 
-                deleteOperation.setOnSucceeded(event1 -> fillView());
-                deleteOperation.setOnFailed(event1 -> fillView());
-                deleteOperation.setOnCancelled(event1 -> fillView());
-
                 new Thread(deleteOperation).start();
             }
         } else if (event.getCode().equals(KeyCode.C) && event.isControlDown()) {
@@ -212,19 +225,48 @@ public class FileTableViewController implements Observer {
             FileEntry storedEntry = FileClipboard.getStoredFileEntry();
 
             CopyOperation copyOperation = new CopyOperation(storedEntry.getFile(), currentDirectory);
-            copyOperation.setOnSucceeded(event1 -> fillView());
-            copyOperation.setOnFailed(event1 -> fillView());
-            copyOperation.setOnCancelled(event1 -> fillView());
 
             new Thread(copyOperation).start();
 
         }
     }
 
-    private void changeCurrentDirectory(File file) {
+    private void changeCurrentDirectory(File file) throws IOException {
         currentDirectory = file;
         pathLabel.setText(file.getAbsolutePath());
+        registerDirectory(currentDirectory);
         fillView();
+    }
+
+    private void registerDirectory(File directory) throws IOException {
+        if (watchKey != null) {
+            watchKey.cancel();
+        }
+        watchKey = directory.toPath().register(service, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+    }
+
+    private void setupDirectoryWatcherThread() {
+        watcherThread = new Thread(() -> {
+            while (true) {
+                WatchKey key = null;
+                try {
+                    key = service.take();
+                } catch (InterruptedException e) {
+                    LOGGER.log(Level.SEVERE, e.toString(), e);
+                }
+
+                if (key != null) {
+                    key.pollEvents().forEach(watchEvent -> {
+                        Platform.runLater(this::fillView);
+                    });
+                }
+
+                key.reset();
+            }
+        });
+
+        watcherThread.setDaemon(true);
+        watcherThread.start();
     }
 
     @Override
