@@ -15,11 +15,11 @@ public class FileEntry implements Serializable {
 
     private File file;
 
-    transient private StringProperty fileName;
+    private transient StringProperty fileName;
 
-    transient private LongProperty fileSize;
+    private transient LongProperty fileSize;
 
-    transient private LongProperty createdOn;
+    private transient LongProperty createdOn;
 
     public FileEntry() {
         fileName = new SimpleStringProperty();
@@ -67,7 +67,7 @@ public class FileEntry implements Serializable {
 
     @Override
     public String toString() {
-        return  "FileEntry=(" +
+        return "FileEntry=(" +
                 "filename=[" + file.getName() + "], "
                 + "fileSize=[" + file.length() + "], "
                 + "createdOn=[" + file.lastModified() + "])";

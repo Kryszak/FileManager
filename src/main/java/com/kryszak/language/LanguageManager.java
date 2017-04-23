@@ -54,7 +54,7 @@ public class LanguageManager extends Observable {
         this.selectedLocale = this.locales.get(selectedLocale);
         this.updateResources();
     }
-    synchronized private void updateResources() {
+    private synchronized void updateResources() {
         this.resources = ResourceBundle.getBundle(BUNDLE_NAME, this.getSelectedLocale());
         this.setChanged();
         this.notifyObservers();

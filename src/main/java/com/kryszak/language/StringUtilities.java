@@ -14,6 +14,10 @@ public class StringUtilities {
 
     private static final String UTF_8 = "UTF-8";
 
+    private StringUtilities(){
+        // blank
+    }
+
     public static String translate(String key) {
         return decodeDefaultEncoding(LanguageManager.getInstance().getResources().getString(key));
     }

@@ -18,6 +18,6 @@ public class MainController implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-
+        //No text to update on main component
     }
 }

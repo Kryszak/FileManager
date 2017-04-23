@@ -6,11 +6,15 @@ public class FileClipboard {
 
     private static FileEntry storedFileEntry;
 
-    public static void storeFileEntry(FileEntry entry){
+    private FileClipboard() {
+        // blank
+    }
+
+    public static void storeFileEntry(FileEntry entry) {
         storedFileEntry = entry;
     }
 
-    public static FileEntry getStoredFileEntry(){
+    public static FileEntry getStoredFileEntry() {
         return storedFileEntry;
     }
 }

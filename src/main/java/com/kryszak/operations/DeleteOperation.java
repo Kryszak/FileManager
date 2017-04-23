@@ -4,44 +4,28 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.logging.Level;
 
 public class DeleteOperation extends FileOperation {
 
-    private final File sourceFile;
-
-    public DeleteOperation(File sourceFile) throws IOException {
-        this.sourceFile = sourceFile;
+    public DeleteOperation(File sourceFile, File destinationDir) throws IOException {
+        super(sourceFile, destinationDir);
         dialog.registerOperation(this, "deleteOperation");
         dialog.show();
     }
 
     @Override
     protected Void call() throws Exception {
-        try {
-            if (sourceFile.isDirectory()) {
-                Collection<File> files = FileUtils.listFiles(sourceFile, null, true);
-                totalFiles = files.size();
-                files.forEach((file) -> {
-                    if(!this.isCancelled()) {
-                        FileUtils.deleteQuietly(file);
-                        currentFileNumber++;
-                        updateProgress(currentFileNumber, totalFiles);
-                    }
-                });
-                if(!this.isCancelled()) {
-                    FileUtils.deleteDirectory(sourceFile);
-                }
-            } else {
-                totalFiles = 1;
-                FileUtils.deleteQuietly(sourceFile);
+        files.forEach(file -> {
+            if (!this.isCancelled()) {
+                FileUtils.deleteQuietly(file);
                 currentFileNumber++;
                 updateProgress(currentFileNumber, totalFiles);
             }
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.toString(), e);
+        });
+        if (!this.isCancelled()) {
+            FileUtils.deleteDirectory(sourceFile);
         }
+
         return null;
     }
 }

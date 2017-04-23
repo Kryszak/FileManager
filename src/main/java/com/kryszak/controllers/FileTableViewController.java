@@ -78,8 +78,6 @@ public class FileTableViewController implements Observer {
 
     private WatchKey watchKey;
 
-    private Thread watcherThread;
-
     @FXML
     private Label pathLabel;
 
@@ -103,7 +101,7 @@ public class FileTableViewController implements Observer {
 
         setTableRowListeners();
 
-        fileView.getColumns().forEach((column) -> column.prefWidthProperty().bind(fileView.widthProperty().multiply(TABLE_WIDTH_PERCENT)));
+        fileView.getColumns().forEach(column -> column.prefWidthProperty().bind(fileView.widthProperty().multiply(TABLE_WIDTH_PERCENT)));
 
         fileNameColumn.setCellValueFactory(new PropertyValueFactory<>(FILE_NAME));
         fileSizeColumn.setCellValueFactory(new PropertyValueFactory<>(FILE_SIZE));
@@ -119,7 +117,7 @@ public class FileTableViewController implements Observer {
 
     private void fillView() {
         data.clear();
-        Arrays.stream(currentDirectory.listFiles()).filter((entry) -> !entry.isHidden()).forEach((entry) -> data.add(
+        Arrays.stream(currentDirectory.listFiles()).filter(entry -> !entry.isHidden()).forEach(entry -> data.add(
                 new FileEntry().file(entry)));
         data.add(new FileEntry().file(currentDirectory.getParentFile()).fileName(PARENT_DIR_NAME));
         fileView.setItems(data);
@@ -214,8 +212,8 @@ public class FileTableViewController implements Observer {
             cancel.setText(translate(CANCEL_OPTION));
             final Optional<ButtonType> result = dialog.showAndWait();
 
-            if (result.get().equals(ButtonType.OK)) {
-                DeleteOperation deleteOperation = new DeleteOperation(rowData.getFile());
+            if (result.isPresent() && result.get().equals(ButtonType.OK)) {
+                DeleteOperation deleteOperation = new DeleteOperation(rowData.getFile(), null);
 
                 new Thread(deleteOperation).start();
             }
@@ -246,19 +244,18 @@ public class FileTableViewController implements Observer {
     }
 
     private void setupDirectoryWatcherThread() {
-        watcherThread = new Thread(() -> {
+        Thread watcherThread = new Thread(() -> {
             while (true) {
                 WatchKey key = null;
                 try {
                     key = service.take();
                 } catch (InterruptedException e) {
                     LOGGER.log(Level.SEVERE, e.toString(), e);
+                    Thread.currentThread().interrupt();
                 }
 
                 if (key != null) {
-                    key.pollEvents().forEach(watchEvent -> {
-                        Platform.runLater(this::fillView);
-                    });
+                    key.pollEvents().forEach(watchEvent -> Platform.runLater(this::fillView));
                 }
 
                 key.reset();

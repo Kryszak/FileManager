@@ -14,6 +14,10 @@ public class ApplicationConfiguration {
 
     private static Properties properties;
 
+    private ApplicationConfiguration() {
+        // blank
+    }
+
     private static void loadProperties() throws IOException {
         properties = new Properties();
         try (InputStream inputStream = ApplicationConfiguration.class.getClassLoader().getResourceAsStream(PROPERTY_FILE)) {
