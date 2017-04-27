@@ -23,6 +23,7 @@ public class ProgressDialogController implements Observer {
     @FXML
     private void initialize() {
         LanguageManager.getInstance().addObserver(this);
+        cancelButton.setText(translate("cancelOption"));
     }
 
     public void registerOperation(Task<Void> task) {
