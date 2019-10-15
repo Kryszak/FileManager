@@ -1,0 +1,18 @@
+language: java
+
+matrix:
+    include:
+        - os: linux
+          sudo: required
+          jdk: openjdk8
+
+cache:
+    directories:
+        - $HOME/.m2
+
+
+script: mvn clean install
+
+after_success:
+    - mvn cobertura:cobertura
+    - bash <(curl -s https://codecov.io/bash)
