@@ -64,3 +64,4 @@ Wymagania opcjonalne:
 
 - implementacja podglądu zawartości plików (np. na bazie komponentu
   z programu JEdit), itp.
+  
